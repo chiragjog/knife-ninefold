@@ -8,9 +8,9 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README.rdoc", "LICENSE" ]
-  s.authors     = ["Seth Chisamore"]
-  s.email       = ["schisamo@opscode.com"]
-  s.homepage    = "https://github.com/opscode/knife-ninefold"
+  s.authors     = ["Chirag Jog"]
+  s.email       = ["chirag@clogeny.com"]
+  s.homepage    = "https://github.com/chiragjog/knife-ninefold"
   s.summary     = %q{Ninefold Compute Support for Chef's Knife Command}
   s.description = s.summary
 
