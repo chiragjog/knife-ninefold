@@ -2,7 +2,7 @@
 
 = DESCRIPTION:
 
-This is the official Opscode Knife plugin for Ninefold Compute (Nova). This plugin gives knife the ability to create, bootstrap, and manage instances in Ninefold Compute clouds.
+This is the unofficial Opscode Knife plugin for Ninefold Cloud. This plugin gives knife the ability to create, bootstrap, and manage instances in Ninefold Compute clouds.
 
 = INSTALLATION:
 
@@ -18,34 +18,30 @@ Depending on your system's configuration, you may need to run this command with 
 
 = CONFIGURATION:
 
-In order to communicate with an Ninefold Compute cloud's EC2 API you will have to tell Knife about your Ninefold Compute cloud API endpoint, Ninefold Access Key and Secret Access Key.  The easiest way to accomplish this is to create some entries in your <tt>knife.rb</tt> file:
+In order to communicate with an Ninefold Compute cloud's NINEFOLD API you will have to tell Knife about your Ninefold Compute cloud API endpoint, Ninefold Access Key and Secret Access Key.  The easiest way to accomplish this is to create some entries in your <tt>knife.rb</tt> file:
 
     ### Note: You may need to append the :ninefold_access_key_id with ":$PROJECT_NAME", if it differs from your Ninefold Username.
     knife[:ninefold_access_key_id]     = "Your Ninefold Access Key ID"
     knife[:ninefold_secret_access_key] = "Your Ninefold Secret Access Key"
-    ### Note: If you are not proxying HTTPS to the Ninefold EC2 API port, the scheme should be HTTP, and the PORT is 8773.
+    ### Note: If you are not proxying HTTPS to the Ninefold NINEFOLD API port, the scheme should be HTTP, and the PORT is 8773.
     knife[:ninefold_api_endpoint]      = "https://cloud.mycompany.com/service/Cloud"
 
 If your knife.rb file will be checked into a SCM system (ie readable by others) you may want to read the values from environment variables:
 
-    knife[:ninefold_access_key_id]     = "#{ENV['EC2_ACCESS_KEY']}"
-    knife[:ninefold_secret_access_key] = "#{ENV['EC2_SECRET_KEY']}"
-    knife[:ninefold_api_endpoint]      = "#{ENV['EC2_URL']}"
+    knife[:ninefold_access_key_id]     = "#{ENV['NINEFOLD_ACCESS_KEY']}"
+    knife[:ninefold_secret_access_key] = "#{ENV['NINEFOLD_SECRET_KEY']}"
+    knife[:ninefold_api_endpoint]      = "#{ENV['NINEFOLD_URL']}"
 
 You also have the option of passing your Ninefold API Key/Secret into the individual knife subcommands using the <tt>-A</tt> (or <tt>--ninefold-access-key-id</tt>) <tt>-K</tt> (or <tt>--ninefold-secret-access-key</tt>) command options
 
-    # provision a new m1.small Ubuntu 10.04 webserver
-    knife ninefold server create 'role[webserver]' -I ami-7000f019 -f m1.small -A 'Your Ninefold Access Key ID' -K 'Your Ninefold Secret Access Key' --ninefold-api-endpoint 'https://cloud.mycompany.com/v1.0'
+    # provision a new webserver
+    knife ninefold server create 'role[webserver]' -I <image template> -f <service offering> -A 'Your Ninefold Access Key ID' -K 'Your Ninefold Secret Access Key' --ninefold-api-endpoint 'https://cloud.mycompany.com/v1.0'
 
 Additionally the following options may be set in your `knife.rb`:
 
 * flavor
 * image
 * availability_zone
-* ninefold_ssh_key_id
-* region
-* distro
-* template_file
 
 = SUBCOMMANDS:
 
@@ -73,8 +69,8 @@ Outputs a list of all available images available to the currently configured Nin
 
 = LICENSE:
 
-Author:: Seth Chisamore (<schisamo@opscode.com>)
-Copyright:: Copyright (c) 2011 Opscode, Inc.
+Author:: Chirag Jog (<chirag@clogeny.com>)
+Copyright:: Copyright (c) 2011 Clogeny
 License:: Apache License, Version 2.0
 
 Licensed under the Apache License, Version 2.0 (the "License");
