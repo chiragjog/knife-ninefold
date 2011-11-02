@@ -10,6 +10,10 @@ Be sure you are running the latest version Chef. Versions earlier than 0.10.0 do
 
     $ gem install chef
 
+Also ensure you are running the latest version of Fog. Versions earlier than 1.0.0 don't support Ninefold Cloud:
+    
+    $ gem update fog 
+ 
 This plugin is distributed as a Ruby Gem. To install it, run:
 
     $ gem install knife-ninefold
@@ -35,7 +39,7 @@ If your knife.rb file will be checked into a SCM system (ie readable by others) 
 You also have the option of passing your Ninefold API Key/Secret into the individual knife subcommands using the <tt>-A</tt> (or <tt>--ninefold-access-key-id</tt>) <tt>-K</tt> (or <tt>--ninefold-secret-access-key</tt>) command options
 
     # provision a new webserver
-    knife ninefold server create 'role[webserver]' -I <image template> -f <service offering> -A 'Your Ninefold Access Key ID' -K 'Your Ninefold Secret Access Key' --ninefold-api-endpoint 'https://cloud.mycompany.com/v1.0'
+    knife ninefold server create 'role[webserver]' -I <image template> -f <service offering> -A 'Your Ninefold Access Key ID'  --ninefold-api-endpoint 'https://cloud.mycompany.com/v1.0'
 
 Additionally the following options may be set in your `knife.rb`:
 
