@@ -146,6 +146,9 @@ class Chef
         print "\n#{ui.color("Waiting for Port Forward rule to be allocated", :magenta)}"
         port_fwd.wait_for { print "."; ready? }
 	
+	server.nic[0]['ipaddress'] = public_ip
+	server.hostname = public_ip
+        msg_pair("Private IP Address", server.ipaddress)
         print "\n#{ui.color("Waiting for sshd", :magenta)}"
 
         print(".") until tcp_test_ssh(public_ip) {
@@ -169,15 +172,16 @@ class Chef
 
       def bootstrap_for_node(server)
         bootstrap = Chef::Knife::Bootstrap.new
-        bootstrap.name_args = [server.displayname.to_s]
+        bootstrap.name_args = [server.ipaddress.to_s]
         bootstrap.config[:run_list] = config[:run_list]
         bootstrap.config[:ssh_user] = 'root'
+	bootstrap.config[:ssh_password] = 'Password01'
         bootstrap.config[:identity_file] = config[:identity_file]
         bootstrap.config[:chef_node_name] = config[:chef_node_name] || server.id.to_s
         bootstrap.config[:prerelease] = config[:prerelease]
-        bootstrap.config[:bootstrap_version] = locate_config_value(:bootstrap_version)
-        bootstrap.config[:distro] = locate_config_value(:distro)
-        bootstrap.config[:template_file] = locate_config_value(:template_file)
+        bootstrap.config[:bootstrap_version] = '0.10.4' 
+        bootstrap.config[:distro] = "ubuntu10.04-gems"
+        bootstrap.config[:template_file] = false
         bootstrap.config[:environment] = config[:environment]
         bootstrap
       end
