@@ -62,12 +62,12 @@ class Chef
       option :identity_file,
         :short => "-i IDENTITY_FILE",
         :long => "--identity-file IDENTITY_FILE",
-        :description => "The SSH identity file used for authentication"
+        :description => "The SSH identity file used for authentication",
         :proc => Proc.new { |key| Chef::Config[:knife][:identity_file] = key }
 
       option :prerelease,
         :long => "--prerelease",
-        :description => "Install the pre-release chef gems"
+        :description => "Install the pre-release chef gems",
         :proc => Proc.new { |key| Chef::Config[:knife][:prerelease] = key }
 
       option :bootstrap_version,
