@@ -59,6 +59,43 @@ class Chef
         :description => "The Chef node name for your new node",
         :proc => Proc.new { |key| Chef::Config[:knife][:chef_node_name] = key }
 
+      option :identity_file,
+        :short => "-i IDENTITY_FILE",
+        :long => "--identity-file IDENTITY_FILE",
+        :description => "The SSH identity file used for authentication"
+        :proc => Proc.new { |key| Chef::Config[:knife][:identity_file] = key }
+
+      option :prerelease,
+        :long => "--prerelease",
+        :description => "Install the pre-release chef gems"
+        :proc => Proc.new { |key| Chef::Config[:knife][:prerelease] = key }
+
+      option :bootstrap_version,
+        :long => "--bootstrap-version VERSION",
+        :description => "The version of Chef to install",
+        :proc => Proc.new { |v| Chef::Config[:knife][:bootstrap_version] = v }
+	:default => "0.10.4"
+
+      option :distro,
+        :short => "-d DISTRO",
+        :long => "--distro DISTRO",
+        :description => "Bootstrap a distro using a template; default is 'ubuntu10.04-gems'",
+        :proc => Proc.new { |d| Chef::Config[:knife][:distro] = d },
+        :default => "ubuntu10.04-gems"
+
+      option :template_file,
+        :long => "--template-file TEMPLATE",
+        :description => "Full path to location of template to use",
+        :proc => Proc.new { |t| Chef::Config[:knife][:template_file] = t },
+        :default => false
+
+      option :run_list,
+        :short => "-r RUN_LIST",
+        :long => "--run-list RUN_LIST",
+        :description => "Comma separated list of roles/recipes to apply",
+        :proc => lambda { |o| o.split(/[\s,]+/) },
+        :default => []
+
 
       def tcp_test_ssh(hostname)
         tcp_socket = TCPSocket.new(hostname, 22)
@@ -110,8 +147,6 @@ class Chef
 	if server.password.nil?
 	   server.password = 'Password01'
 	end
-	puts("Server Name:" + server.name + "\n")
-	puts("Server Password:" + server.password + "\n")
 
         msg_pair("Instance ID", server.id)
         msg_pair("Flavor", server.flavor_id)
@@ -127,28 +162,7 @@ class Chef
         puts("\n")
 
         msg_pair("Private IP Address", server.ipaddress)
-	ipaddress = connection.addresses.create(ipaddress_def)
-        print "\n#{ui.color("Waiting for ip address to be allocated", :magenta)}"
-        ipaddress.wait_for { print "."; ready? }
-	#Enable Static Nat
-	ipaddress.enable_static_nat(server)
-
-        public_ip = ipaddress.ipaddress	
-
-	# Create Ip port forwarding rule for SSH
-	port_fwd_rule_def = {
-		'protocol' => 'TCP',
-		'ipaddressid' => ipaddress.id,
-		'startport' => 22,
-		'endport' => 22
-	}
-	port_fwd = connection.ip_forwarding_rules.create(port_fwd_rule_def)
-        print "\n#{ui.color("Waiting for Port Forward rule to be allocated", :magenta)}"
-        port_fwd.wait_for { print "."; ready? }
-	
-	server.nic[0]['ipaddress'] = public_ip
-	server.hostname = public_ip
-        msg_pair("Private IP Address", server.ipaddress)
+	server.hostname = server.ipaddress
         print "\n#{ui.color("Waiting for sshd", :magenta)}"
 
         print(".") until tcp_test_ssh(public_ip) {
@@ -165,7 +179,6 @@ class Chef
         msg_pair("Region", server.zonename.to_s)
         msg_pair("Password", server.password.to_s)
         msg_pair("IP Address", server.ipaddress.to_s)
-        msg_pair("Public IP Address", public_ip.to_s)
         msg_pair("Name", server.displayname.to_s)
 
       end
@@ -175,13 +188,13 @@ class Chef
         bootstrap.name_args = [server.ipaddress.to_s]
         bootstrap.config[:run_list] = config[:run_list]
         bootstrap.config[:ssh_user] = 'root'
-	bootstrap.config[:ssh_password] = 'Password01'
+	bootstrap.config[:ssh_password] = server.password.to_s || 'Password01'
         bootstrap.config[:identity_file] = config[:identity_file]
         bootstrap.config[:chef_node_name] = config[:chef_node_name] || server.id.to_s
         bootstrap.config[:prerelease] = config[:prerelease]
-        bootstrap.config[:bootstrap_version] = '0.10.4' 
-        bootstrap.config[:distro] = "ubuntu10.04-gems"
-        bootstrap.config[:template_file] = false
+        bootstrap.config[:bootstrap_version] = locate_config_value(:bootstrap_version) 
+        bootstrap.config[:distro] = locate_config_value(:distro)
+        bootstrap.config[:template_file] = locate_config_value(:template_file)
         bootstrap.config[:environment] = config[:environment]
         bootstrap
       end
